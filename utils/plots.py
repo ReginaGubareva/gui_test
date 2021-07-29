@@ -447,3 +447,21 @@ def plot_results(start=0, stop=0, bucket='', id=(), labels=(), save_dir=''):
 
     ax[1].legend()
     fig.savefig(Path(save_dir) / 'results.png', dpi=200)
+
+
+def plotLearning(scores, filename, x=None, window=5):
+    n = len(scores)
+    running_avg = np.empty(n)
+    for t in range(n):
+        running_avg[t] = np.mean(scores[max(0, t - window):(t + 1)])
+    if x is None:
+        x = [i for i in range(n)]
+    plt.ylabel('Score')
+    plt.xlabel('Game')
+    plt.plot(x, running_avg)
+    plt.savefig(filename)
+
+
+def normalize(observation):
+    pass
+

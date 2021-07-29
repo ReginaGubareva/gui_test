@@ -35,8 +35,6 @@ def centroid_detection(image, counter):
     hide_conf = False
     line_thickness = 3
 
-    print(type(image))
-
     # Initialize
     set_logging()
     device = select_device(device)
@@ -93,16 +91,12 @@ def centroid_detection(image, counter):
             imc = im0.copy() if save_crop else im0  # for opt.save_crop
             if len(det):
                 # Rescale boxes from img_size to im0 size
+                # print("im0.shape", im0.shape)
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
 
                 for *xyxy, conf, cls in reversed(det):
-                    if save_txt:  # Write to file
-                        xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
-                        line = (cls, *xywh, conf) if save_conf else (cls, *xywh)  # label format
-                        # print(('%g ' * len(line)).rstrip() % line + '\n')
-
-                        c1, c2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
-                        centroid = int((c2[0] + c1[0]) / 2), int((c2[1] + c1[1]) / 2)
-                        centroids.append(centroid)
+                    c1, c2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
+                    centroid = int((c2[0] + c1[0]) / 2), int((c2[1] + c1[1]) / 2)
+                    centroids.append(centroid)
 
     return centroids

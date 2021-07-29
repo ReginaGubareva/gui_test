@@ -31,6 +31,7 @@ class ActorCriticNetwork(keras.Model):
 
         return v, pi
 
+
 class Agent:
     def __init__(self, alpha=0.0003, gamma=0.99, n_actions=2):
         self.gamma = gamma
@@ -40,8 +41,8 @@ class Agent:
         self.actor_critic = ActorCriticNetwork(n_actions=n_actions)
         self.actor_critic.compile(optimizer=Adam(learning_rate=alpha))
 
-
     def choose_action(self, observation):
+        print('obs shape', observation.shape)
         # action_space = ['click', 'type']
         # state = tf.keras.preprocessing.image.img_to_array(observation)
         state = self.convert_img_to_tensor(observation)
@@ -61,7 +62,6 @@ class Agent:
     def load_models(self):
         print('Loading models')
         self.actor_critic.load_weights(self.actor_critic.checkpoint_file)
-
 
     def learn(self, state, reward, state_, done):
         # state = tf.convert_to_tensor([state], dtype=tf.float32)
@@ -92,11 +92,11 @@ class Agent:
         self.actor_critic.optimizer.apply_gradients(zip(
             gradient, self.actor_critic.trainable_variables))
 
-
-    def convert_img_to_tensor(self, state):
+    @staticmethod
+    def convert_img_to_tensor(state):
         state = np.array(state)
         shape = state.shape
-        #normalized_metrics = normalize(state, axis=0, norm='l1')
+        # normalized_metrics = normalize(state, axis=0, norm='l1')
         flat_arr = state.ravel()
         result_arr = []
         # print('normalized metrics: ', normalized_metrics)

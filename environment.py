@@ -10,7 +10,10 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.chrome.options import Options
 from process_image import ProcessImage
 import detect
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import json
 
 class Environment:
     def __init__(self):
@@ -19,7 +22,11 @@ class Environment:
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option('useAutomationExtension', False)
         options.add_experimental_option('w3c', False)
-        # options.add_argument("--window-size=1920,1080")
+        options.add_argument("--disable-notifications")
+        options.add_argument("--disable-popup-blocking")
+        options.add_argument('--disable-web-security')
+        # options.add_argument("--window-size=1296,710")
+        options.add_argument("--kiosk")
         self.chrome = r"D:\chromedriver.exe"
         self.url = fr'https://vk.com/'
         self.driver = webdriver.Chrome(executable_path=self.chrome, chrome_options=options)
@@ -57,10 +64,21 @@ class Environment:
                 reward = -1
                 # print('No changes')
         if action == 1:
-            ac.move_to_element_with_offset(element_body, coordinates[0], coordinates[1]).click().perform()
+            # f = open('resources/hash_tables/hash_table.json', )
+            # data = json.load(f)
+            # value = ""
+            # for i in data["https://vk.com/"]:
+            #     if i["centroids"] == str(coordinates[0]) + " " + str(coordinates[1]):
+            #         value = i["data"]
+            # print("value: ", value)
+            # if value != "":
+            ac.move_to_element_with_offset(element_body, coordinates[0], coordinates[1])\
+                        .click().perform()
+            ac.send_keys("blabla")
+
             time.sleep(2)
 
-            counter, centorids, state_ = self.get_observation(counter)
+            counter, centroids, state_ = self.get_observation(counter)
             if self.is_terminal(self):
                 reward = 3
                 done = True
@@ -78,8 +96,8 @@ class Environment:
             return True
 
     def no_changes(self, state):
-        initial = cv2.imread("resources/initial1.png")
-        initial = cv2.resize(initial, (216, 116))
+        initial = cv2.imread("resources/initial.jpg")
+        # initial = cv2.resize(initial, (216, 116))
         initial = cv2.cvtColor(initial, cv2.COLOR_BGR2GRAY)
         # print('shapes:', initial.shape, state.shape)
         state = cv2.cvtColor(state, cv2.COLOR_BGR2GRAY)
@@ -93,7 +111,9 @@ class Environment:
     def get_observation(self, counter):
         img = self.image_processor.get_screen(self)
         thresh = self.image_processor.get_thresh_image(img)
-        state, counter = self.image_processor.get_resized_image(img, counter)
-        centroids = detect.centroid_detection(thresh, counter)
-        return counter, centroids, state
+        # state, counter = self.image_processor.get_resized_image(img, counter)
+        centroids = detect.centroid_detection(img, counter)
+        return counter, centroids, img
+
+
 

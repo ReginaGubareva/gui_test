@@ -9,26 +9,111 @@ import pytesseract
 from PIL import ImageGrab
 from ac_network import Agent
 from detect import centroid_detection
+import json
+from utils.plots import plotLearning
 
-# credentials
-# sber41353
-# ABCabc123**
+#############################################
+############### Test json  ##################
+#############################################
+env = Environment()
+agent = Agent(alpha=0.0003, gamma=0.99, n_actions=2)
+
+score_history = []
+score = 0
+n_episodes = 30
+
+for i in range(n_episodes):
+    print('episode: ', i, 'score %.3f' % score)
+    done = False
+    score = 0
+    counter = 0
+    reward = 0
+    state_ = 0
+    env.reset()
+    counter, centroids, state = env.get_observation(counter)
+    for j in range(len(centroids)):
+        # action = agent.choose_action(state).numpy()
+        # # print("action", action)
+        # x = round(centroids[j][0] // 6)
+        # y = round(centroids[j][1] // 6)
+        # act = action[y][x]
+        # print('act:', act)
+        state_, reward, done, info = env.step(1, centroids[j], counter)
+        state = state_
+        score += reward
+    score_history.append(score)
+    agent.learn(state, reward, state_, done)
+
+filename = './resources/plot_learning/gui_test.png'
+plotLearning(score_history, filename=filename, window=25)
+
+
+#############################################
+########### Test write in json  #############
+#############################################
+# env = Environment()
+#
+# url = env.driver.current_url
+# data = {url: []}
+# counter = 2
+# counter, centroids, state = env.get_observation(counter)
+# print(centroids)
+#
+#
+# inputs = env.driver.execute_script("return document.getElementsByTagName('input');")
+# for i in range(len(centroids)):
+#     clas = inputs[i].get_attribute("class")
+#     print(inputs[i].get_attribute("name"), str(centroids[i][0]) + " " + str(centroids[i][1]))
+#     if "input" in clas:
+#         data[url].append({
+#             'name': inputs[i].get_attribute("name"),
+#             'centroids': str(centroids[i][0]) + " " + str(centroids[i][1]),
+#             'data': ''
+#         })
+#
+# with open('resources/hash_tables/hash_table.json', 'w') as outfile:
+#     json.dump(data, outfile)
+
 
 
 #############################################
 ############# Test hash tables  #############
 #############################################
-env = Environment()
-counter = 2
-counter, centroids, state = env.get_observation(counter)
-print(centroids)
+# url, name, centroids, data
 
-# centroids = [[960, 567], [504, 260], [502, 622], [573, 625], [436, 625], [965, 434], [539, 626], [470, 625], [164, 28], [178, 670], [342, 554], [986, 243], [504, 625], [964, 178], [970, 368], [967, 123], [963, 489], [1064, 27], [1057, 585], [862, 584], [426, 347], [880, 245], [436, 25], [963, 585]]
-
-
+# env = Environment()
+# counter = 2
+# counter, centroids, state = env.get_observation(counter)
+# print(centroids)
+#
+#
 # inputs = env.driver.execute_script("return document.getElementsByTagName('input');")
 # for i in range(len(inputs)):
-#     print('input', i, ':', inputs[i])
+#     clas = inputs[i].get_attribute("class")
+#     if "input" in clas:
+#         print('input name', i, ':', type(clas))
+#         env.driver.execute_script("let myCanvas = document.createElement('canvas');" +
+#                                   "document.body.appendChild(myCanvas);" +
+#                                   "myCanvas.id = 'canvas';" +
+#                                   "myCanvas.style.position = 'absolute';" +
+#                                   "myCanvas.style.left = '0px';" +
+#                                   "myCanvas.style.top = '0px';" +
+#                                   "myCanvas.width = window.innerWidth;" +
+#                                   "myCanvas.height = window.innerHeight;" +
+#                                   "let ctx = myCanvas.getContext('2d');" +
+#                                   "let x = " + str(centroids[i][0]) + ";" +
+#                                   "let y = " + str(centroids[i][1]) + ";" +
+#                                   "ctx.fillStyle = '#2980b9';" +
+#                                   "ctx.beginPath();" +
+#                                   "ctx.arc(x, y, 10, 0, 2 * Math.PI);" +
+#                                   "ctx.fill();")
+
+
+
+
+
+
+
 
 
 # for i in range(len(centroids)):
@@ -40,13 +125,45 @@ print(centroids)
 #                               "}" +
 #                               "}"
 #                               , centroids[i][0], centroids[i][1])
-    # print(element)
-    # if element is not None:
-    #     env.driver.execute_script("elem.style.color = red;")
+# print(element)
+# if element is not None:
+#     env.driver.execute_script("elem.style.color = red;")
 
 # element = env.driver.find_element_by_css_selector("input[type='submit']")
 # print('element:', element.text)
 
+
+
+
+#############################################
+############# Test centroids  ###############
+#############################################
+# env = Environment()
+#
+# agent = Agent(alpha=0.0003, gamma=0.99, n_actions=2)
+# score_history = []
+# score = 0
+# n_episodes = 20
+# counter = 0
+#
+# counter, centroids, state = env.get_observation(counter)
+#
+# for j in range(len(centroids)):
+#     env.driver.execute_script("let myCanvas = document.createElement('canvas');" +
+#                               "document.body.appendChild(myCanvas);" +
+#                               "myCanvas.id = 'canvas';" +
+#                               "myCanvas.style.position = 'absolute';" +
+#                               "myCanvas.style.left = '0px';" +
+#                               "myCanvas.style.top = '0px';" +
+#                               "myCanvas.width = window.innerWidth;" +
+#                               "myCanvas.height = window.innerHeight;" +
+#                               "let ctx = myCanvas.getContext('2d');" +
+#                               "let x = " + str(centroids[j][0]) + ";" +
+#                               "let y = " + str(centroids[j][1]) + ";" +
+#                               "ctx.fillStyle = '#2980b9';" +
+#                               "ctx.beginPath();" +
+#                               "ctx.arc(x, y, 10, 0, 2 * Math.PI);" +
+#                               "ctx.fill();")
 
 
 #############################################
@@ -75,20 +192,24 @@ print(centroids)
 #############################################
 ############### Test main   #################
 #############################################
-
 # env = Environment()
 #
 # agent = Agent(alpha=0.0003, gamma=0.99, n_actions=2)
 # score_history = []
 # score = 0
 # n_episodes = 20
+# counter = 0
 #
+# counter, centroids, state = env.get_observation(counter)
 # for i in range(n_episodes):
 #     print('episode: ', i, 'score %.3f' % score)
 #     done = False
 #     score = 0
 #     counter = 0
 #     env.reset()
+#
+#     counter, centroids, state = env.get_observation(counter)
+#     print('counter', counter, 'centroids', centroids, 'state', state)
 #     env.driver.execute_script("var myCanvas = document.createElement('canvas');" +
 #                               "document.body.appendChild(myCanvas);" +
 #                               "myCanvas.id = 'canvas';" +
@@ -109,10 +230,7 @@ print(centroids)
 #                               "ctx.closePath();" +
 #                               "setTimeout(function () { ctx.clearRect(0, 0, myCanvas.width, myCanvas.height) }, 300);" +
 #                               "})")
-#     counter, centroids, state = env.get_observation(counter)
-#     # print('counter', counter, 'centroids', centroids, 'state', state)
 #
-#     # while not done:
 #     for j in range(len(centroids)):
 #         action = agent.choose_action(state).numpy()
 #         # print("action", action)
