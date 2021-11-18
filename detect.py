@@ -3,8 +3,9 @@ from pathlib import Path
 import numpy as np
 
 import cv2
-import torch
-
+import torch, gc
+gc.collect()
+torch.cuda.empty_cache()
 from models.experimental import attempt_load
 from utils.general import check_img_size, non_max_suppression, apply_classifier, \
     scale_coords, xyxy2xywh, set_logging, increment_path, save_one_box
@@ -17,7 +18,7 @@ def centroid_detection(image, counter):
     centroids = []
     weights = fr'weights/last.pt'
     save_dir = increment_path(Path(fr'runs/detect/exp'))
-    device = ''  # device can be '' cuda device, i.e. 0 or 0,1,2,3 or cpu
+    device = 'cpu'  # device can be '' cuda device, i.e. 0 or 0,1,2,3 or cpu
     imgsz = 640
     conf_thres = 0.25  # object confidence threshold
     iou_thres = 0.45  # IOU threshold for NMS
@@ -62,6 +63,7 @@ def centroid_detection(image, counter):
     dataset = LoadImages(image_path, img_size=imgsz, stride=stride)
 
     for path, img, im0s, vid_cap in dataset:
+        test_img = img.copy()
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -98,5 +100,10 @@ def centroid_detection(image, counter):
                     c1, c2 = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3]))
                     centroid = int((c2[0] + c1[0]) / 2), int((c2[1] + c1[1]) / 2)
                     centroids.append(centroid)
+                    cv2.circle(im0, (centroid[0], centroid[1]), 10, [255, 102, 0], 2)
+
+            # cv2.imshow('Test image', im0)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
 
     return centroids

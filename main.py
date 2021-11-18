@@ -32,7 +32,7 @@ if __name__ == '__main__':
             y = round(centroids[j][1] // 6)
             act = action[y][x]
             print('act:', act)
-            state_, reward, done, info = env.step(act, centroids[j], counter)
+            state_, reward, done, info = env.step(state, act, centroids[j], counter)
             state = state_
             score += reward
         score_history.append(score)

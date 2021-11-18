@@ -1,0 +1,22 @@
+conda update -n base -c defaults conda
+
+conda install numpy
+conda install -c conda-forge selenium
+conda install -c conda-forge tensorflow
+conda install -c conda-forge pytesseract
+conda install -c conda-forge opencv
+conda install -c conda-forge tensorflow-probability
+conda install -c pytorch pytorch
+conda install scikit-image
+conda install -c conda-forge tqdm
+conda install -c pytorch torchvision
+conda install -c anaconda seaborn
+conda install -c conda-forge flatbuffers
+conda install -c conda-forge python-flatbuffers
+pip install --ignore-installed --upgrade tensorflow
+conda install scipy=1.6.1
+conda install -c anaconda protobuf
+conda install -c omnia termcolor
+
+// if will some problems with tensorflow installation
+pip install --upgrade --no-deps --force-reinstall tensorflow

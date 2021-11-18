@@ -1,0 +1,52 @@
+{
+    "https://vk.com/": [
+        {
+            "name": "pass",
+            "coordinates": "877 153",
+            "text": "a20r19i27i17m25*",
+            "tag name": "input"
+        },
+        {
+            "name": "pass",
+            "coordinates": "958 151",
+            "text": "a20r19i27i17m25*",
+            "tag name": "input"
+        },
+        {
+            "name": "",
+            "coordinates": "860 504",
+            "text": "7",
+            "tag name": "input"
+        },
+        {
+            "name": "",
+            "coordinates": "437 19",
+            "text": "search",
+            "tag name": "input"
+        },
+        {
+            "name": "",
+            "coordinates": "960 504",
+            "text": "December",
+            "tag name": "input"
+        },
+        {
+            "name": "first_name",
+            "coordinates": "960 378",
+            "text": "Ivan",
+            "tag name": "input"
+        },
+        {
+            "name": "email",
+            "coordinates": "965 105",
+            "text": "rengubareva@gmail.com",
+            "tag name": "input"
+        },
+        {
+            "name": "last_name",
+            "coordinates": "963 423",
+            "text": "Ivanov",
+            "tag name": "input"
+        }
+    ]
+}

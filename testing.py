@@ -1,7 +1,10 @@
 import time
 import numpy as np
 import os
-import gym
+from selenium.webdriver.chrome import webdriver
+from selenium.webdriver.chrome.options import Options
+from torch.autograd import variable
+
 from environment import Environment
 from selenium.webdriver import ActionChains
 import cv2
@@ -11,42 +14,370 @@ from ac_network import Agent
 from detect import centroid_detection
 import json
 from utils.plots import plotLearning
+from selenium.webdriver.common.keys import Keys
+import json
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+
+
+# import tensorflow as tf
+# print(tf.__version__)
+# print(tf.__path__)
+
+# a20r19i27i17m25*
+
+# env = Environment()
+# time.sleep(10)
+# el = env.driver.find_element_by_id("top_profile_link")
+# ac = ActionChains(env.driver)
+# ac.move_to_element(el).click().perform()
+# # el1 = env.driver.find_element_by_id("top_logout_link")
+# # ac.move_to_element(el1).click().perform()
+# # ac.reset_actions()
+# env.driver.find_element_by_xpath("//select[@id='top_logout_link']/option[text()='Выйти']").click()
 
 #############################################
-############### Test json  ##################
+############### True main  ##################
 #############################################
 env = Environment()
 agent = Agent(alpha=0.0003, gamma=0.99, n_actions=2)
 
 score_history = []
 score = 0
-n_episodes = 30
+n_episodes = 20
+counter = 0
 
+counter, centroids, state = env.get_observation(counter)
+
+# data = {}
+# for i in range(len(centroids)):
+#
+#     element = env.driver.execute_script('return document.elementFromPoint(' +
+#                                         str(centroids[i][0]) + ',' + str(centroids[i][1]) + ');')
+#     if element is not None:
+#         if element.tag_name == 'input':
+#             text = env.driver.execute_script('el = document.elementFromPoint(' +
+#                                              str(centroids[i][0]) + ',' + str(centroids[i][1]) + ');' +
+#                                              'el.style.border="3px solid red";' +
+#                                              'await new Promise(r => setTimeout(r, 3000));' +
+#                                              'text = el.value;' +
+#                                              'return text;')
+#             data[centroids[i]] = text
+
+data = {(860, 504): '7', (437, 19): 'search', (960, 504): 'July',
+        (963, 151): 'a20r19i27i17m25*', (965, 105): 'rengubareva@gmail.com',
+        (960, 378): 'Ivan', (962, 423): 'Ivanov'}
+
+env.data = data
+env.reset()
+
+f = open('weights/general_weights', "a")
+average_episode_reward = 0
 for i in range(n_episodes):
-    print('episode: ', i, 'score %.3f' % score)
+
+    f.write('episode: ' + str(i) + ' score: ' + str(score) + str("\n"))
+    print('episode: ', i, ' score %.3f' % score)
     done = False
     score = 0
-    counter = 0
     reward = 0
     state_ = 0
-    env.reset()
-    counter, centroids, state = env.get_observation(counter)
-    for j in range(len(centroids)):
-        # action = agent.choose_action(state).numpy()
-        # # print("action", action)
-        # x = round(centroids[j][0] // 6)
-        # y = round(centroids[j][1] // 6)
-        # act = action[y][x]
-        # print('act:', act)
-        state_, reward, done, info = env.step(1, centroids[j], counter)
+
+    while not done:
+        counter, centroids, state = env.get_observation(counter)
+        action = agent.choose_action(state).numpy()
+        state_, reward, done, counter = env.step(state, action, centroids, counter)
+
+        if done:
+            reward += 4
+
+        if done and env.driver.current_url == 'https://vk.com/feed':
+            reward += 5
+            el = env.driver.find_element_by_id("top_logout_link")
+            ac = ActionChains(env.driver)
+            ac.move_to_element(el).click().perform()
+            ac.reset_actions()
+
         state = state_
         score += reward
-    score_history.append(score)
-    agent.learn(state, reward, state_, done)
-
+        agent.learn(state, reward, state_, done)
+    average_episode_reward += score / counter
+    score_history.append(average_episode_reward)
+    f.write("\n")
+f.close()
 filename = './resources/plot_learning/gui_test.png'
 plotLearning(score_history, filename=filename, window=25)
 
+
+############################################
+######## Get screen of full page  ##########
+############################################
+# env = Environment()
+# counter = 2
+# counter, centroids, state = env.get_observation(counter)
+# for j in range(len(centroids)):
+#     ac = ActionChains(env.driver)
+#     element_body = env.driver.find_element_by_tag_name("body")
+#     ac.move_to_element_with_offset(element_body, centroids[j][0], centroids[j][1]).click().perform()
+#     time.sleep(2)
+# env.driver.quit()
+
+
+############################################
+### Check if repeated elements exists  #####
+############################################
+# elements = []
+# for i in range(len(centroids)):
+#     el = env.driver.execute_script('el =  document.elementFromPoint(' +
+#                                        str(centroids[i][0]) + ',' + str(centroids[i][1]) + ');' +
+#                                        'return el;')
+#     elements.append(el)
+#
+# print('el-s length', len(elements))
+# for i in range(len(elements) - 1):
+#     print('el_id', elements[i].get_attribute('name'))
+#     if elements[i].id == elements[i+1].id:
+#         print('repeated elements')
+
+
+#############################################
+########### Get web elements  ###############
+#############################################
+# env = Environment()
+# counter = 0
+# counter, centroids, state = env.get_observation(counter)
+# data = {}
+# data[env.url] = []
+#
+# centroids2 = []
+# for centroid in centroids:
+#     buff = [centroid[0] - 10, centroid[1]]
+#     centroids2.append(buff)
+#
+# print('centroids', centroids)
+# print('centroids2', centroids2)
+#
+# for i in range(len(centroids)):
+#     element = env.driver.execute_script('return document.elementFromPoint(' +
+#                                         str(centroids2[i][0]) + ',' + str(centroids2[i][1]) + ');')
+#
+#     if element.tag_name != "null" and (element.tag_name == "input" or
+#        element.tag_name == "text"):
+#
+#         text = env.driver.execute_script('el = document.elementFromPoint(' +
+#                                          str(centroids2[i][0]) + ',' + str(centroids2[i][1]) + ');' +
+#                                          'el.style.border="3px solid red";' +
+#                                          'await new Promise(r => setTimeout(r, 6000));' +
+#                                          'text = el.value;' +
+#                                          'return text;')
+#         data[env.url].append({
+#             'name': element.get_attribute("name"),
+#             'coordinates': str(centroids2[i][0]) + ' ' + str(centroids2[i][1]),
+#             'text': text,
+#             'tag name': element.tag_name
+#         })
+#         print('text:', text)
+#
+#     with open('resources/hash_tables/hash_table1.json', 'w', encoding='utf-8') as f:
+#         json.dump(data, f, ensure_ascii=False, indent=4)
+
+# {"https://vk.com/": [{"name": "email", "centroids": "967 105", "data": "rengubareva@gmail.com"},
+# {"name": "pass", "centroids": "966 152", "data": "a20r19i27i17m25*"}]}
+# {
+#             "name": "",
+#             "coordinates": "1061 504",
+#             "text": "1995",
+#             "tag name": "input"
+#         }
+
+
+#############################################
+############### Test main  ##################
+#############################################
+# env = Environment()
+# agent = Agent(alpha=0.0003, gamma=0.99, n_actions=2)
+#
+# score_history = []
+# score = 0
+# n_episodes = 10
+# counter, centroids, state = env.get_observation(0)
+#
+# centroids2 = []
+# for centroid in centroids:
+#     buff = [centroid[0] - 10, centroid[1]]
+#     centroids2.append(buff)
+#
+# # for i in range(n_episodes):
+# #     env.create_json_data(centroids2)
+#
+# f = open('weights/general_weights', "a")
+# for i in range(n_episodes):
+#     f.write('episode: ' + str(i) + ' score: ' + str(score) + str("\n"))
+#     print('episode: ', i, ' score %.3f' % score)
+#     done = False
+#     score = 0
+#     counter = 0
+#     reward = 0
+#     state_ = 0
+#     env.reset()
+#     counter, centroids, state = env.get_observation(counter)
+#     centroids2 = []
+#     for centroid in centroids:
+#         buff = [centroid[0] - 10, centroid[1]]
+#         centroids2.append(buff)
+#
+#     for j in range(len(centroids2)):
+#         action = agent.choose_action(state).numpy()
+#         # print("action", action)
+#         x = round(centroids2[j][0] // 6)
+#         y = round(centroids2[j][1] // 6)
+#         act = action[y][x]
+#
+#         state_, reward, done, info = env.step(state, act, centroids2[j], counter)
+#         f.write("   action: " + str(act) + " x: " + str(x) + " y: " + str(y) + " reward: " + str(reward) + "\n")
+#         state = state_
+#         score += reward
+#         score_history.append(score)
+#         agent.learn(state, reward, state_, done)
+#     f.write("\n")
+# f.close()
+# filename = './resources/plot_learning/gui_test.png'
+# plotLearning(score_history, filename=filename, window=25)
+
+
+#############################################
+############### Test json  ##################
+#############################################
+# env = Environment()
+#
+# counter = 0
+# counter, centroids, state = env.get_observation(counter)
+# f = open('resources/hash_tables/hash_table.json', )
+# data = json.load(f)
+# value = ""
+#
+#
+# ac = ActionChains(env.driver)
+# element_body = env.driver.find_element_by_tag_name("body")
+#
+# for i in data["https://vk.com/"]:
+#     # print("i[centroids]:", i["centroids"])
+#     for j in range(len(centroids)):
+#         # env.mark_centroids(str(centroids[j][0]), str(centroids[j][1]))
+#
+#         if i["centroids"] == str(centroids[j][0]) + " " + str(centroids[j][0]):
+#             print("True")
+#         value = i["data"]
+#     print("value", value)
+#     ac.move_to_element_with_offset(element_body, centroids[j][0], centroids[j][1]) \
+#         .click().send_keys(value).perform()
+#     time.sleep(2)
+
+
+#############################################
+############# Compare images ################
+#############################################
+# env = Environment()
+# counter = 0
+# state = cv2.imread("resources/initial.png")
+# state = cv2.resize(state, (216, 116))
+# state = cv2.cvtColor(state, cv2.COLOR_BGR2GRAY)
+#
+# print('state:', state.shape)
+# for i in range(3):
+#     print('counter', counter)
+#     counter, observation, screen = env.get_observation(counter)
+#     state1 = cv2.resize(screen, (216, 116))
+#     state1 = cv2.cvtColor(state1, cv2.COLOR_BGR2GRAY)
+#     print('state1:', state1.shape)
+#
+#     if env.image_processor.compare_images(state1, state) > 0.997:
+#         state = state1
+#         print(True)
+#     else:
+#         state = state1
+#         print(False)
+
+#############################################
+## Check centroids for thresh and for img  ##
+#############################################
+# env = Environment()
+# img = env.image_processor.get_screen(env)
+# thresh = env.image_processor.get_gray_image(img)
+# centroids_img = centroid_detection(img, counter=0)
+# centroids_thresh = centroid_detection(thresh, counter=0)
+# for j in range(len(centroids_img)):
+#     env.driver.execute_script("let myCanvas = document.createElement('canvas');" +
+#                               "document.body.appendChild(myCanvas);" +
+#                               "myCanvas.id = 'canvas';" +
+#                               "myCanvas.style.position = 'absolute';" +
+#                               "myCanvas.style.left = '0px';" +
+#                               "myCanvas.style.top = '0px';" +
+#                               "myCanvas.width = window.innerWidth;" +
+#                               "myCanvas.height = window.innerHeight;" +
+#                               "let ctx = myCanvas.getContext('2d');" +
+#                               "let x = " + str(centroids_img[j][0]) + ";" +
+#                               "let y = " + str(centroids_img[j][1]) + ";" +
+#                               "ctx.fillStyle = '#fef907';" +
+#                               "ctx.beginPath();" +
+#                               "ctx.arc(x, y, 10, 0, 2 * Math.PI);" +
+#                               "ctx.fill();")
+
+# for j in range(len(centroids_thresh)):
+#     env.driver.execute_script("let myCanvas = document.createElement('canvas');" +
+#                               "document.body.appendChild(myCanvas);" +
+#                               "myCanvas.id = 'canvas';" +
+#                               "myCanvas.style.position = 'absolute';" +
+#                               "myCanvas.style.left = '0px';" +
+#                               "myCanvas.style.top = '0px';" +
+#                               "myCanvas.width = window.innerWidth;" +
+#                               "myCanvas.height = window.innerHeight;" +
+#                               "let ctx = myCanvas.getContext('2d');" +
+#                               "let x = " + str(centroids_thresh[j][0]) + ";" +
+#                               "let y = " + str(centroids_thresh[j][1]) + ";" +
+#                               "ctx.fillStyle = '#ff3333';" +
+#                               "ctx.beginPath();" +
+#                               "ctx.arc(x, y, 10, 0, 2 * Math.PI);" +
+#                               "ctx.fill();")
+
+
+#############################################
+############ Mark centroids  ################
+#############################################
+# env.driver.execute_script("let myCanvas = document.createElement('canvas');" +
+#                           "document.body.appendChild(myCanvas);" +
+#                           "myCanvas.id = 'canvas';" +
+#                           "myCanvas.style.position = 'absolute';" +
+#                           "myCanvas.style.left = '0px';" +
+#                           "myCanvas.style.top = '0px';" +
+#                           "myCanvas.width = window.innerWidth;" +
+#                           "myCanvas.height = window.innerHeight;" +
+#                           "let ctx = myCanvas.getContext('2d');" +
+#                           "let x = " + str(centroids[j][0]) + ";" +
+#                           "let y = " + str(centroids[j][1]) + ";" +
+#                           "ctx.fillStyle = '#2980b9';" +
+#                           "ctx.beginPath();" +
+#                           "ctx.arc(x, y, 10, 0, 2 * Math.PI);" +
+#                           "ctx.fill();")
+
+#############################################
+########### Get coordinates  ################
+#############################################
+# env.driver.execute_script("function printMousePos(event) {" +
+#                           "document.body.textContent =" +
+#                           "'clientX: ' + event.clientX +" +
+#                           " '- clientY: ' + event.clientY; " +
+#                           "}" +
+#                           "document.addEventListener('click', printMousePos);")
+
+#############################################
+########### Working typing  #################
+#############################################
+# ac = ActionChains(env.driver)
+# element_body = env.driver.find_element_by_tag_name("body")
+# ac.move_to_element_with_offset(element_body, 948, 109)
+# ac.click().send_keys('login').perform()
 
 #############################################
 ########### Test write in json  #############
@@ -73,7 +404,6 @@ plotLearning(score_history, filename=filename, window=25)
 #
 # with open('resources/hash_tables/hash_table.json', 'w') as outfile:
 #     json.dump(data, outfile)
-
 
 
 #############################################
@@ -109,13 +439,6 @@ plotLearning(score_history, filename=filename, window=25)
 #                                   "ctx.fill();")
 
 
-
-
-
-
-
-
-
 # for i in range(len(centroids)):
 #     env.driver.execute_script("element = document.elementFromPoint(arguments[0],arguments[1]); " +
 #                               "if(element != null){" +
@@ -132,7 +455,27 @@ plotLearning(score_history, filename=filename, window=25)
 # element = env.driver.find_element_by_css_selector("input[type='submit']")
 # print('element:', element.text)
 
-
+#############################################
+####### Get centroids with opencv  ##########
+#############################################
+# @staticmethod
+# def get_centroids(img):
+#     boxes = pytesseract.image_to_data(img)
+#     centroids = []
+#     for a, b in enumerate(boxes.splitlines()):
+#         centroid = []
+#         if a != 0:
+#             b = b.split()
+#             if len(b) == 12:
+#                 x, y, w, h = int(b[6]), int(b[7]), int(b[8]), int(b[9])
+#                 cv2.putText(img, b[11], (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 1, (50, 50, 255), 2)
+#                 cv2.rectangle(img, (x, y), (x + w, y + h), (50, 50, 255), 2)
+#                 cv2.circle(img, (int(x + w / 2), int(y + h / 2)), 3, (255, 0, 0), 2)
+#                 centroid.append(int(x + w / 2))
+#                 centroid.append(int(y + h / 2))
+#                 centroids.append(centroid)
+#
+#     return centroids
 
 
 #############################################
@@ -169,14 +512,14 @@ plotLearning(score_history, filename=filename, window=25)
 #############################################
 ############### Test detection  #############
 #############################################
-# img = cv2.imread("resources/test_images/5.jpg")
+# img = cv2.imread("resources/test_images/initial.jpg")
 # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 #
 # centroids = centroid_detection(img)
 
 # env = Environment()
 #
-# img = cv2.imread(fr"resources/test_images/5.jpg")
+# img = cv2.imread(fr"resources/test_images/initial.jpg")
 # counter = 0
 #
 # counter, centroids, state, screen = env.get_observation(counter)
@@ -470,32 +813,6 @@ plotLearning(score_history, filename=filename, window=25)
 #                             output_dims=[len(observation)],
 #                             GAMMA=0.99, n_actions=2,
 #                             layer1_size=128, layer2_size=128)
-
-
-#############################################
-############# Compare images ################
-#############################################
-# env = Environment()
-# counter = 0
-# for i in range(3):
-#     counter, observation, img_resized = env.get_env_observation(counter)
-#     print(env.no_changes(img_resized))
-
-# state2 = cv2.imread("resources/initial1.png")
-# state2 = cv2.resize(state2, (216, 116))
-# state2 = cv2.cvtColor(state2, cv2.COLOR_BGR2GRAY)
-# print('state2:', state2.shape)
-# for i in range(3):
-#     print('counter', counter)
-#     counter, observation, img_resized = env.get_env_observation(counter)
-#     state1 = cv2.cvtColor(img_resized, cv2.COLOR_BGR2GRAY)
-#     print('state1:', state1.shape)
-#     if env.compare_images(state1, state2) > 0.997:
-#         state2 = state1
-#         print(True)
-#     else:
-#         state2 = state1
-#         print(False)
 
 
 #############################################

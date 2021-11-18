@@ -8,7 +8,7 @@ from tensorflow.keras.optimizers import Adam
 
 
 class ActorCriticNetwork(keras.Model):
-    def __init__(self, n_actions, fc1_dims=1296, fc2_dims=696,
+    def __init__(self, n_actions, fc1_dims=256, fc2_dims=256,
                  name='actor_critic', chkpt_dir='tmp/actor_critic'):
         super(ActorCriticNetwork, self).__init__()
         self.fc1_dims = fc1_dims
@@ -42,7 +42,6 @@ class Agent:
         self.actor_critic.compile(optimizer=Adam(learning_rate=alpha))
 
     def choose_action(self, observation):
-        print('obs shape', observation.shape)
         # action_space = ['click', 'type']
         # state = tf.keras.preprocessing.image.img_to_array(observation)
         state = self.convert_img_to_tensor(observation)
