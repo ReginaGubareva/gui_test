@@ -51,7 +51,7 @@ class Agent:
         action = action_probabilities.sample()
         log_prob = action_probabilities.log_prob(action)
         self.action = action
-        # print('action:', action.shape)
+        print('action:', action.shape)
         return action
 
     def save_models(self):

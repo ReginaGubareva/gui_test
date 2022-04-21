@@ -26,7 +26,6 @@ from selenium.webdriver.common.by import By
 # print(tf.__version__)
 # print(tf.__path__)
 
-# a20r19i27i17m25*
 
 # env = Environment()
 # time.sleep(10)
@@ -46,29 +45,29 @@ agent = Agent(alpha=0.0003, gamma=0.99, n_actions=2)
 
 score_history = []
 score = 0
-n_episodes = 20
+n_episodes = 10
 counter = 0
 
 counter, centroids, state = env.get_observation(counter)
 
-# data = {}
-# for i in range(len(centroids)):
-#
-#     element = env.driver.execute_script('return document.elementFromPoint(' +
-#                                         str(centroids[i][0]) + ',' + str(centroids[i][1]) + ');')
-#     if element is not None:
-#         if element.tag_name == 'input':
-#             text = env.driver.execute_script('el = document.elementFromPoint(' +
-#                                              str(centroids[i][0]) + ',' + str(centroids[i][1]) + ');' +
-#                                              'el.style.border="3px solid red";' +
-#                                              'await new Promise(r => setTimeout(r, 3000));' +
-#                                              'text = el.value;' +
-#                                              'return text;')
-#             data[centroids[i]] = text
+data = {}
+for i in range(len(centroids)):
 
-data = {(860, 504): '7', (437, 19): 'search', (960, 504): 'July',
-        (963, 151): 'a20r19i27i17m25*', (965, 105): 'rengubareva@gmail.com',
-        (960, 378): 'Ivan', (962, 423): 'Ivanov'}
+    element = env.driver.execute_script('return document.elementFromPoint(' +
+                                        str(centroids[i][0]) + ',' + str(centroids[i][1]) + ');')
+    if element is not None:
+        if element.tag_name == 'input':
+            text = env.driver.execute_script('el = document.elementFromPoint(' +
+                                             str(centroids[i][0]) + ',' + str(centroids[i][1]) + ');' +
+                                             'el.style.border="3px solid red";' +
+                                             'await new Promise(r => setTimeout(r, 3000));' +
+                                             'text = el.value;' +
+                                             'return text;')
+            data[centroids[i]] = text
+
+# data = {(860, 504): '7', (437, 19): 'search', (960, 504): 'July',
+#         (963, 151): '', (965, 105): '',
+#         (960, 378): 'Ivan', (962, 423): 'Ivanov'}
 
 env.data = data
 env.reset()
@@ -182,8 +181,8 @@ plotLearning(score_history, filename=filename, window=25)
 #     with open('resources/hash_tables/hash_table1.json', 'w', encoding='utf-8') as f:
 #         json.dump(data, f, ensure_ascii=False, indent=4)
 
-# {"https://vk.com/": [{"name": "email", "centroids": "967 105", "data": "rengubareva@gmail.com"},
-# {"name": "pass", "centroids": "966 152", "data": "a20r19i27i17m25*"}]}
+# {"https://vk.com/": [{"name": "email", "centroids": "967 105", "data": ""},
+# {"name": "pass", "centroids": "966 152", "data": ""}]}
 # {
 #             "name": "",
 #             "coordinates": "1061 504",
@@ -635,7 +634,7 @@ plotLearning(score_history, filename=filename, window=25)
 #     if element is not None:
 #         ac.move_to_element_with_offset(element_body, centroids[i][0], centroids[i][1]).click().perform()
 #         time.sleep(1)
-#         ac.move_to_element(element).send_keys('rengubareva@gmail.com')
+#         ac.move_to_element(element).send_keys('')
 #         print(element)
 
 

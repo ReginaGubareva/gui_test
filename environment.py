@@ -86,7 +86,7 @@ class Environment:
             x = coordinates[j][0]
             y = coordinates[j][1]
 
-            act = action[y][x]
+            act = action[y // 256][x // 256]
 
             if act == 0:
                 self.mark_element_click(x, y)
@@ -123,7 +123,6 @@ class Environment:
                 return self.data.get(key)
         return ""
 
-
     def act_click(self, x, y, ac, body):
         ac.move_to_element_with_offset(body, x, y).click().perform()
         ac.reset_actions()
@@ -156,10 +155,11 @@ class Environment:
         if counter == 0:
             image_path = fr"D:\Projects\gui_test\resources\initial.png"
             cv2.imwrite(image_path, img)
-        # img = im_processor.get_thresh_image3(img)
+        # tresh_img = im_processor.get_thresh_image3(img)
         # im_processor.save_image(img, counter)
         centroids = detect.centroid_detection(img, counter)
         # centroids = self.get_shift_centroids(centroids)
+        img = cv2.resize(img, (256, 256))
         counter += 1
         return counter, centroids, img
 
@@ -239,9 +239,9 @@ class Environment:
         return result
 
 # options.add_argument('--headless')
-        # options.add_argument('--start-maximized')
-        # options.set_capability('unhandledPromptBehavior', 'accept')
-        # options.add_argument("--window-size=1296,710")
+# options.add_argument('--start-maximized')
+# options.set_capability('unhandledPromptBehavior', 'accept')
+# options.add_argument("--window-size=1296,710")
 
 # f = open('resources/hash_tables/hash_table.json', )
 # data = json.load(f)
@@ -254,22 +254,22 @@ class Environment:
 
 
 # f = open('resources/hash_tables/hash_table.json', )
-        # data = json.load(f)
-        # value = ""
-        # for i in data["https://vk.com/"]:
-        #     if i["coordinates"] == str(x) + " " + str(y):
-        #         print("in data, true")
-        #         if "input" == i["tag name"] or i["tag name"] == "text":
-        #             value = i["text"]
-        # return value
+# data = json.load(f)
+# value = ""
+# for i in data["https://vk.com/"]:
+#     if i["coordinates"] == str(x) + " " + str(y):
+#         print("in data, true")
+#         if "input" == i["tag name"] or i["tag name"] == "text":
+#             value = i["text"]
+# return value
 
- # elements_the_same = True
-                # self.driver.execute_script('el =  document.elementFromPoint(' + str(x) + ',' + str(y) +
-                #                                            '); ' +
-                #                                            'previous_el = document.elementFromPoint(' + str(previous_x)
-                #                                            + ',' + str(previous_y) + '); ' +
-                #                                            'const equal = el.isEqualNode(previous_el);'
-                #                                            'return equal;')
-            # if value == "":
-            #     if elements_the_same:
-            #         continue
+# elements_the_same = True
+# self.driver.execute_script('el =  document.elementFromPoint(' + str(x) + ',' + str(y) +
+#                                            '); ' +
+#                                            'previous_el = document.elementFromPoint(' + str(previous_x)
+#                                            + ',' + str(previous_y) + '); ' +
+#                                            'const equal = el.isEqualNode(previous_el);'
+#                                            'return equal;')
+# if value == "":
+#     if elements_the_same:
+#         continue

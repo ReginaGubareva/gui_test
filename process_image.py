@@ -23,20 +23,21 @@ def get_thresh_image3(img):
     blurred = cv2.GaussianBlur(gray, (7, 7), 0)
     (T, threshInv) = cv2.threshold(blurred, 200, 255,
                                    cv2.THRESH_BINARY_INV)
-    cv2.imshow("Threshold Binary Inverse", threshInv)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-    (T1, thresh) = cv2.threshold(blurred, 200, 255, cv2.THRESH_BINARY)
-    cv2.imshow("Threshold Binary", thresh)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("Threshold Binary Inverse", threshInv)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    #
+    # (T1, thresh) = cv2.threshold(blurred, 200, 255, cv2.THRESH_BINARY)
+    # cv2.imshow("Threshold Binary", thresh)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
     masked = cv2.bitwise_and(img, img, mask=threshInv)
-    cv2.imshow("Output", masked)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    return masked
+    # cv2.imshow("Output", masked)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    print(gray.shape)
+    return gray
 
 def get_thresh_image2(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
