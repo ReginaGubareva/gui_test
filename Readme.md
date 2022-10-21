@@ -1,3 +1,7 @@
+This is a neural network for training searching for the bugs in user interface. 
+It is based on Juha Eskonen master thesis, a couple of papers and actor-critic algortihm of the reinforcement learning. 
+
+
 The main info in testing.py file. To launch the project use testing.py file. 
 
 Before launch: pip install requirements.txt
