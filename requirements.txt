@@ -13,7 +13,7 @@ blinker==1.4
 CacheControl==0.12.6
 cachetools==4.2.4
 cachy==0.3.0
-certifi==2021.10.8
+certifi==2022.12.7
 charset-normalizer==2.0.7
 clang==5.0
 cleo==0.8.1
